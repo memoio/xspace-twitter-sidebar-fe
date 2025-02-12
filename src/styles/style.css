@@ -1,0 +1,139 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Paytone+One&display=swap');
+
+.paytone-one {
+    font-family: "Paytone One", serif;
+    font-weight: 400;
+    font-style: normal;
+}
+
+  
+.inter {
+    font-family: "Inter", serif;
+    font-optical-sizing: auto;
+    font-style: normal;
+}
+
+.bg {
+
+}
+.dtm {
+    box-shadow: 0px 3px 20px #1784E2;
+}
+
+.virtuals-partners {
+    background-image: url('/images/Group 48096175.png');
+}
+
+.why-choose {
+    box-shadow: 5px 8px 29px #1784E252;
+}
+
+.email {
+    box-shadow: 5px 8px 20px #6FBCFF;
+}
+
+.mickey {
+    -webkit-text-fill-color: transparent; 
+    -webkit-background-clip: text; 
+}
+
+.card-shadow {
+    box-shadow: 0px 0px 19px #1784E2;
+    border: 1px solid #1784E2;
+}
+
+.refer-banner {
+    background-image: url('/images/Rectangle 39224.png');
+}
+
+.bg-blur {
+    backdrop-filter: blur(57px);
+    -webkit-backdrop-filter: blur(57px);
+}
+
+.create-agent {
+    background-image: url('/images/circles.png');
+}
+
+.active-track-category {
+    font-weight: 600;
+}
+
+.tooltip {
+    position: relative;
+    display: inline-block;
+  }
+  
+  .tooltip .tooltiptext {
+    visibility: hidden;
+    width: 140px;
+    background-color: #555;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px;
+    position: absolute;
+    z-index: 1;
+    bottom: 150%;
+    left: 50%;
+    margin-left: -75px;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  
+  .tooltip .tooltiptext::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: #555 transparent transparent transparent;
+  }
+  
+  .tooltip:hover .tooltiptext {
+    visibility: visible;
+    opacity: 1;
+  }
+
+*::-webkit-scrollbar {
+    width: 0px;
+    color: blue;
+}
+
+.text-shadow {
+    text-shadow: 0px 4px 33px #1784E2;
+}
+
+.token-mech {
+    background-image: url('/images/Rectangle 84.png');
+}
+
+.shadow-6FBCFF {
+    box-shadow: 0px 0px 34px #6FBCFF49;
+}
+
+#ton-connect > div {
+    position: absolute;
+    inset: 0;
+}
+/*
+tc-root {
+    position: absolute;
+    inset: 0;
+}
+
+.go3572451881, .go3572451881 button {
+    position: absolute;
+    inset: 0;
+    width: 100% !important;
+}
+*/
+
+@media (min-width: 768px) {
+    .create-agent {
+        background-image: none;
+    }
+}
