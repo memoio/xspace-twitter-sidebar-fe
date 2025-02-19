@@ -1,9 +1,13 @@
-import Link from "next/link"
-import { useRouter } from "next/router"
-import { useRef, useState, useEffect } from "react"
-import { useAccount } from 'wagmi'
+import Link from "next/link";
+import { useRouter } from "next/router";
+import { useRef, useState, useEffect } from "react";
+import { useAuth } from "@/context/AuthContext";
+import { clear } from "@/storage/token";
+import { useDisconnect } from 'wagmi';
 
 export default function DataSpace() {
+    const router = useRouter()
+
     const menu = useRef(null)
     const dataSpaceButton = useRef(null)
     const taskButton = useRef(null)
@@ -12,12 +16,12 @@ export default function DataSpace() {
     const dataSpace = useRef(null)
     const task = useRef(null)
     const [isCheckedIn, setIsCheckedIn] = useState(false)
-    const { address } = useAccount();
-
     const [time, setTime] = useState(null); // State to store time left
     const [hours, setHours] = useState(0);
     const [minutes, setMinutes] = useState(0);
     const [seconds, setSeconds] = useState(0);
+    const { accountAddress } = useAuth();
+    const { disconnect } = useDisconnect();
 
     useEffect(() => {
         if (time === null) return; // Exit if time hasn't been fetched yet
@@ -42,7 +46,6 @@ export default function DataSpace() {
             const hours = time / 3600
             const minutes = (hours - parseInt(hours)) * 60
             const seconds = (minutes - parseInt(minutes)) * 60
-
 
             setHours(parseInt(hours));
             setMinutes(parseInt(minutes));
@@ -75,14 +78,30 @@ export default function DataSpace() {
         setIsCheckedIn(true)
     }
 
+    const handleBack = () => {
+        clear();
+        disconnect();
+        router.back();
+    };
+
     return (
         <div className="p-8 flex flex-col gap-4 min-h-screen bg-gradient-to-r from-[#00110A] to-[#000402]">
             <div className="flex justify-between items-center">
                 <h1 className="paytone-one text-3xl">XSpace</h1>
-                <button className="bg-x-green px-4 py-2 rounded-full text-black text-xs">Refer your Friends</button>
+            </div>
+            <div className="w-full bg-[#021B12] p-4 rounded-xl font-bold grid grid-cols-2 items-center">
+
+                <p className="truncat">
+                    {accountAddress}
+                </p>
+                <p className="flex justify-end cursor-pointer">
+                    <img src="/back.png"
+                        className="w-8 h-8"
+                        onClick={handleBack}
+                    ></img>
+                </p>
             </div>
 
-            <p className="w-full bg-[#021B12] p-4 rounded-xl font-bold mt-4 truncate">{address}</p>
 
             <div className="w-full bg-[#021B12] p-4 rounded-xl font-bold">
                 <div className="grid grid-cols-2">
@@ -98,7 +117,10 @@ export default function DataSpace() {
             <div className="w-full bg-[#021B12] p-4 rounded-xl flex flex-col gap-2">
                 <h2 className="font-bold">Data DID</h2>
                 <p className="inter">You can participate in earning points only after successfully creating a DID.</p>
-                <button className="bg-x-green px-4 py-2 rounded-full text-black text-xs w-fit">Create DID</button>
+                <button className="bg-x-green px-4 py-2 rounded-full text-black text-xs w-fit"
+                    onClick={() => {
+                        window.open('https://data.memolabs.org/', '_blank');
+                    }}>Create DID</button>
             </div>
 
             <div className="mt-4 flex flex-col gap-4">
@@ -143,7 +165,13 @@ export default function DataSpace() {
                         </div>
                         <button ref={checkInButton} onClick={toggleCheckIn} className="rounded-full px-4 py-1.5 text-sm bg-x-green text-black w-fit text-nowrap">Check In</button>
                     </div>
-
+                    <div className="w-full bg-[#021B12] p-6 rounded-xl flex items-center justify-between gap-2">
+                        <div className="flex flex-col gap-2">
+                            <h2 className="text-white text-lg font-bold">Refer Your Friends</h2>
+                            <p className="text-xs">Invite Friends To Earn More Points.</p>
+                        </div>
+                        <Link href={"/tasks/random-memo"} className="rounded-full px-4 py-1.5 text-sm bg-x-green text-black w-fit text-nowrap">Go</Link>
+                    </div>
                     <div className="w-full bg-[#021B12] p-6 rounded-xl flex items-center justify-between gap-2">
                         <div className="flex flex-col gap-2">
                             <h2 className="text-white text-lg font-bold">Community Tasks</h2>
@@ -160,6 +188,6 @@ export default function DataSpace() {
                     </div>
                 </div>
             </div>
-        </div>
+        </div >
     )
 }

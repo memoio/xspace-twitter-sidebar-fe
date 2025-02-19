@@ -35,6 +35,7 @@ export const API_URL = {
 export const XSPACE_URL = {
     "CHALLENGE": XSPACE_SERVER_URL + "/v1/challenge",
     "LOG_IN": XSPACE_SERVER_URL + "/v1/login",
+    "REFRESH": XSPACE_SERVER_URL + "/v1/refresh",
 
     "MINT_TWEET_NFT": XSPACE_SERVER_URL + "/v1/nft/tweet/mint",
     "MINT_DATA_NFT": XSPACE_SERVER_URL + "/v1/nft/data/mint"

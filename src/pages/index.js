@@ -1,24 +1,19 @@
-import { XSPACE_URL } from "@/config/config";
+// import { XSPACE_URL } from "@/config/config";
 import Image from "next/image";
 import { useRouter } from "next/router";
-import axios from 'axios';
+// import axios from 'axios';
+import { challenge, login } from "@/api/api";
+import { setToken, checkExpire } from "@/storage/token";
 
 import { ConnectButton } from '@rainbow-me/rainbowkit';
-import { useAccount, useSignMessage } from 'wagmi'
-import { signIn, signOut, useSession } from "next-auth/react";
+import { useAccount, useSignMessage } from 'wagmi';
 import { useEffect } from "react";
 
 export default function Home() {
     const router = useRouter();
 
     const { isConnected, address } = useAccount();
-    const { data: session, status } = useSession()
     const { signMessageAsync } = useSignMessage();
-
-    /**
-     * Check if account exists before creating and signing
-     * Add next auth
-     */
 
     function sendStorageData(accessToken, refreshToken) {
         const data = {
@@ -35,62 +30,26 @@ export default function Home() {
     const Login = async () => {
         try {
             if (isConnected) {
-                const response = await axios.get(
-                    XSPACE_URL.CHALLENGE,
-                    {
-                        params: {
-                            address,
-                        },
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Origin': 'https://xspace.com'
-                        }
-                    }
-                );
+                const message = await challenge(address);
+                console.log(message);
+                const signature = await signMessageAsync({ message: message });
+                const { accessToken, refreshToken } = await login(message, signature);
+                setToken(accessToken, refreshToken);
 
-                if (response.status == 200) {
-                    const message = response.data
-                    console.log(message)
-                    const signature = await signMessageAsync({ message: message })
-
-                    const logResponse = await axios.post(
-                        XSPACE_URL.LOG_IN,
-                        {
-                            "message": message,
-                            "signature": signature
-                        },
-                        {
-                            params: {
-                                address,
-                            },
-                            headers: {
-                                'Content-Type': 'application/json',
-                            },
-                        }
-                    );
-
-                    const token = logResponse.data.accessToken
-                    if (logResponse.status == 200) {
-                        await signIn("credentials", {
-                            redirect: false, // Set to true if you want to redirect after sign-in
-                            token, // Pass the identifier to your provider
-                        });
-                        console.log("access token: ", logResponse.data.accessToken);
-                        console.log("refresh token: ", logResponse.data.refreshToken);
-                        sendStorageData(logResponse.data.accessToken, logResponse.data.refreshToken);
-
-                        // window.location.replace('/data-space')
-                        router.push('/data-space')
-                    }
-                }
+                sendStorageData(accessToken, refreshToken);
+                router.push("/data-space");
             }
         } catch (e) {
-            alert(e)
+            alert(e);
         }
     }
 
     useEffect(() => {
-        Login();
+        if (checkExpire()) {
+            Login();
+        } else {
+            router.push("/data-space");
+        }
     }, [isConnected])
 
     return (
@@ -109,10 +68,6 @@ export default function Home() {
                     }) => {
                         return (
                             <button onClick={() => {
-                                if (status == "authenticated") {
-                                    alert("authenticated");
-                                    signOut();
-                                }
                                 openConnectModal();
                             }} className="bg-x-green p-2 rounded-full flex gap-2 w-fit mx-auto relative">
                                 <Image src={"/images/clarity_arrow-line.svg"} width={25} height={25} alt="" />
