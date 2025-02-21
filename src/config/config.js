@@ -10,7 +10,7 @@ export const TEST_SXPACE_SERVER_URL = "https://test-xs-api.memolabs.net"
 
 export const DEV_SXPACE_SERVER_URL = "http://localhost:7890"
 
-export const XSPACE_SERVER_URL = DEV_SXPACE_SERVER_URL
+export const XSPACE_SERVER_URL = TEST_SXPACE_SERVER_URL
 
 
 export const AIRDROP_BACKEND_URL = TEST_AIRDROP_BACKEND_URL
