@@ -3,7 +3,8 @@ import Image from "next/image";
 import { useRouter } from "next/router";
 // import axios from 'axios';
 import { challenge, login } from "@/api/api";
-import { setToken, checkExpire } from "@/storage/token";
+import { setToken, checkExpire, getToken } from "@/storage/token";
+import { useUser } from "@/context/UserContext";
 
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { useAccount, useSignMessage } from 'wagmi';
@@ -14,6 +15,7 @@ export default function Home() {
 
     const { isConnected, address } = useAccount();
     const { signMessageAsync } = useSignMessage();
+    const { update } = useUser();
 
     function sendStorageData(accessToken, refreshToken) {
         const data = {
@@ -36,6 +38,7 @@ export default function Home() {
                 const { accessToken, refreshToken } = await login(message, signature);
                 setToken(accessToken, refreshToken);
 
+                update();
                 sendStorageData(accessToken, refreshToken);
                 router.push("/data-space");
             }
@@ -44,12 +47,19 @@ export default function Home() {
         }
     }
 
-    useEffect(() => {
+    const autoLogin = async () => {
         if (checkExpire()) {
             Login();
         } else {
+            update();
+            const { accessToken, refreshToken } = await getToken();
+            sendStorageData(accessToken, refreshToken);
             router.push("/data-space");
         }
+    }
+
+    useEffect(() => {
+        autoLogin();
     }, [isConnected])
 
     return (
@@ -68,7 +78,11 @@ export default function Home() {
                     }) => {
                         return (
                             <button onClick={() => {
-                                openConnectModal();
+                                if (isConnected) {
+                                    autoLogin();
+                                } else {
+                                    openConnectModal();
+                                }
                             }} className="bg-x-green p-2 rounded-full flex gap-2 w-fit mx-auto relative">
                                 <Image src={"/images/clarity_arrow-line.svg"} width={25} height={25} alt="" />
                                 Connect Wallet

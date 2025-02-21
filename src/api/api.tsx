@@ -1,4 +1,4 @@
-import { XSPACE_URL } from "@/config/config";
+import { XSPACE_URL, DID_URL } from "@/config/config";
 import axios from 'axios';
 
 export async function challenge(address: string): Promise<string> {
@@ -15,12 +15,10 @@ export async function challenge(address: string): Promise<string> {
         }
     );
 
-    console.log(response.status);
-    console.log(response.data);
-
     if (response.status !== 200) {
         throw new Error(`API request failed with status ${response.status}: ${response.data}`);
     }
+    console.log(response.data);
 
     return response.data;
 }
@@ -39,11 +37,10 @@ export async function login(message: string, signature: string): Promise<{ acces
         }
     );
 
-    console.log(response.data);
-
     if (response.status !== 200) {
         throw new Error(`API request failed with status ${response.status}: ${response.data}`);
     }
+    console.log(response.data);
 
     return {
         accessToken: response.data.accessToken,
@@ -67,4 +64,49 @@ export async function refresh(refreshToken: string): Promise<string> {
     }
 
     return response.data.accessToken;
+}
+
+export async function getUserInfo(accessToken: string): Promise<{ points: number, referrals: number, space: number, invitedCode: string }> {
+    const response = await axios.get(
+        XSPACE_URL.GET_USER_INFO,
+        {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${accessToken}`
+            }
+        }
+    );
+
+    if (response.status !== 200) {
+        throw new Error(`API request failed with status ${response.status}: ${response.data}`);
+    }
+
+    return {
+        points: response.data.Points,
+        referrals: response.data.Referrals,
+        space: response.data.Space,
+        invitedCode: response.data.InvitedCode,
+    };
+}
+
+export async function getDIDInfo(address: string): Promise<{ did: string, number: string }> {
+    console.log(address);
+    const response = await axios.get(
+        DID_URL.DID_INFO,
+        {
+            params: {
+                address,
+            },
+        }
+    );
+
+    if (response.status !== 200) {
+        throw new Error(`API request failed with status ${response.status}: ${response.data}`);
+    }
+    console.log(response.data);
+
+    return {
+        did: response.data.did,
+        number: response.data.number,
+    };
 }

@@ -1,9 +1,12 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useRef, useState, useEffect } from "react";
-import { useAuth } from "@/context/AuthContext";
 import { clear } from "@/storage/token";
 import { useDisconnect } from 'wagmi';
+
+import { useAuth } from "@/context/AuthContext";
+import { useUser } from "@/context/UserContext";
+import { useDid } from "@/context/DIDContext";
 
 export default function DataSpace() {
     const router = useRouter()
@@ -22,6 +25,8 @@ export default function DataSpace() {
     const [seconds, setSeconds] = useState(0);
     const { accountAddress } = useAuth();
     const { disconnect } = useDisconnect();
+    const { userInfo, setSpace, setPoints } = useUser();
+    const { didInfo } = useDid();
 
     useEffect(() => {
         if (time === null) return; // Exit if time hasn't been fetched yet
@@ -92,7 +97,7 @@ export default function DataSpace() {
             <div className="w-full bg-[#021B12] p-4 rounded-xl font-bold grid grid-cols-2 items-center">
 
                 <p className="truncat">
-                    {accountAddress}
+                    {accountAddress.slice(0, 7)}...{accountAddress.slice(37)}
                 </p>
                 <p className="flex justify-end cursor-pointer">
                     <img src="/back.png"
@@ -105,23 +110,32 @@ export default function DataSpace() {
 
             <div className="w-full bg-[#021B12] p-4 rounded-xl font-bold">
                 <div className="grid grid-cols-2">
-                    <p className="border-r border-solid border-white/15 font-bold text-sm py-2">Total Points</p>
-                    <p className="border-l border-solid border-white/15 font-bold text-sm py-2 text-right">Total Referrals</p>
+                    <p className="border-r border-solid border-white/15 font-bold text-sm py-2">MemoUnis</p>
+                    <p className="border-l border-solid border-white/15 font-bold text-sm py-2 text-right">Referrals</p>
                 </div>
                 <div className="grid grid-cols-2">
-                    <p className="font-bold text-sm py-2 text-x-green">-</p>
-                    <p className="font-bold text-sm py-2 text-x-green text-right">-</p>
+                    <p className="font-bold text-sm py-2 text-x-green">{userInfo.points}</p>
+                    <p className="font-bold text-sm py-2 text-x-green text-right">{userInfo.referrals}</p>
                 </div>
             </div>
 
-            <div className="w-full bg-[#021B12] p-4 rounded-xl flex flex-col gap-2">
-                <h2 className="font-bold">Data DID</h2>
-                <p className="inter">You can participate in earning points only after successfully creating a DID.</p>
-                <button className="bg-x-green px-4 py-2 rounded-full text-black text-xs w-fit"
-                    onClick={() => {
-                        window.open('https://data.memolabs.org/', '_blank');
-                    }}>Create DID</button>
-            </div>
+            {
+                didInfo.number === "0" || !didInfo.number ? (
+                    <div className="w-full bg-[#021B12] p-4 rounded-xl flex flex-col gap-2">
+                        <h2 className="font-bold">Data DID</h2>
+                        <p className="inter">You can participate in earning points only after successfully creating a DID.</p>
+                        <button className="bg-x-green px-4 py-2 rounded-full text-black text-xs w-fit"
+                            onClick={() => {
+                                window.open('https://data.memolabs.org/', '_blank');
+                            }}>Create DID</button>
+                    </div>
+                ) : (
+                    <div className="w-full bg-[#021B12] p-4 rounded-xl flex flex-col gap-2">
+                        <h2 className="font-bold">Data DID</h2>
+                        <p className="inter">No.{didInfo.number}</p>
+                        <p className="inter">{didInfo.did}</p>
+                    </div>
+                )}
 
             <div className="mt-4 flex flex-col gap-4">
                 <div ref={menu} className="flex gap-4">
@@ -132,8 +146,8 @@ export default function DataSpace() {
                 <div ref={dataSpace} className="flex flex-col gap-4">
                     <div className="w-full bg-[#021B12] p-6 rounded-xl flex items-center justify-between gap-2">
                         <div className="flex flex-col gap-2">
-                            <h2 className="text-white text-lg font-bold">Storage Units</h2>
-                            <p className="text-x-green text-xs">994 storage units left</p>
+                            <h2 className="text-white text-lg font-bold">Storage Spaces</h2>
+                            <p className="text-x-green text-xs">{userInfo.space} storage spaces left</p>
                         </div>
                         <Link href={"/add"} className="rounded-full px-4 py-1.5 text-sm bg-x-green text-black">+Add</Link>
                     </div>
@@ -170,14 +184,20 @@ export default function DataSpace() {
                             <h2 className="text-white text-lg font-bold">Refer Your Friends</h2>
                             <p className="text-xs">Invite Friends To Earn More Points.</p>
                         </div>
-                        <Link href={"/tasks/random-memo"} className="rounded-full px-4 py-1.5 text-sm bg-x-green text-black w-fit text-nowrap">Go</Link>
+                        <button className="bg-x-green px-4 py-2 rounded-full text-black text-xs w-fit"
+                            onClick={() => {
+                                window.open('https://testxspace.memolabs.net/refer-your-friend', '_blank');
+                            }}>Go</button>
                     </div>
                     <div className="w-full bg-[#021B12] p-6 rounded-xl flex items-center justify-between gap-2">
                         <div className="flex flex-col gap-2">
                             <h2 className="text-white text-lg font-bold">Community Tasks</h2>
                             <p className="text-xs">Complete tasks & receive points rewards.</p>
                         </div>
-                        <Link href={"/tasks/random-memo"} className="rounded-full px-4 py-1.5 text-sm bg-x-green text-black w-fit text-nowrap">Go</Link>
+                        <button className="bg-x-green px-4 py-2 rounded-full text-black text-xs w-fit"
+                            onClick={() => {
+                                window.open('https://testxspace.memolabs.net/tasks', '_blank');
+                            }}>Go</button>
                     </div>
                     <div className="w-full bg-[#021B12] p-6 rounded-xl flex items-center justify-between gap-2">
                         <div className="flex flex-col gap-2">

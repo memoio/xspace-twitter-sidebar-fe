@@ -14,6 +14,9 @@ import {
 import { mainnet } from "wagmi/chains";
 import "@rainbow-me/rainbowkit/styles.css";
 import { AuthContextProvider } from "@/context/AuthContext";
+import { UserContextProvider } from "@/context/UserContext";
+import { DIDContextProvider } from "@/context/DIDContext";
+
 const connectors = connectorsForWallets(
     [
         {
@@ -42,13 +45,15 @@ export default function App({ Component, pageProps }) {
     return (
         <WagmiProvider config={config}>
             <QueryClientProvider client={queryClient}>
-                {/* <SessionProvider session={pageProps.session} refetchInterval={0}> */}
                 <RainbowKitProvider locale="en-US" modalSize="compact" theme={darkTheme()}>
                     <AuthContextProvider>
-                        <Component {...pageProps} />
+                        <UserContextProvider>
+                            <DIDContextProvider>
+                                <Component {...pageProps} />
+                            </DIDContextProvider>
+                        </UserContextProvider>
                     </AuthContextProvider>
                 </RainbowKitProvider>
-                {/* </SessionProvider> */}
             </QueryClientProvider>
         </WagmiProvider>
     )

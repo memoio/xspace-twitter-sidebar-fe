@@ -8,21 +8,27 @@ export function setToken(accessToken: string, refreshToken: string) {
     localStorage.setItem("refreshToken", refreshToken);
 }
 
-export async function getToken(): Promise<string | null> {
+export async function getToken(): Promise<{ accessToken: string, refreshToken: string } | null> {
     const accessToken = localStorage.getItem("accessToken");
+    const refreshToken = localStorage.getItem("refreshToken");
     if (isTokenExpire(accessToken, REFRESH_THRESHOLD)) {
-        const refreshToken = localStorage.getItem("refreshToken");
         if (isTokenExpire(refreshToken, 0)) {
             const newAccessToken = await refresh(refreshToken);
             localStorage.setItem("accessToken", newAccessToken);
-            return newAccessToken;
+            return {
+                accessToken: newAccessToken,
+                refreshToken: refreshToken
+            };
         } else {
             localStorage.clear();
             return null;
         }
     }
 
-    return accessToken;
+    return {
+        accessToken: accessToken,
+        refreshToken: refreshToken
+    };
 }
 
 export function clear() {
