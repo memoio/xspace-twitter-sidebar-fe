@@ -9,26 +9,30 @@ export function setToken(accessToken: string, refreshToken: string) {
 }
 
 export async function getToken(): Promise<{ accessToken: string, refreshToken: string } | null> {
-    const accessToken = localStorage.getItem("accessToken");
-    const refreshToken = localStorage.getItem("refreshToken");
-    if (isTokenExpire(accessToken, REFRESH_THRESHOLD)) {
-        if (isTokenExpire(refreshToken, 0)) {
-            const newAccessToken = await refresh(refreshToken);
-            localStorage.setItem("accessToken", newAccessToken);
-            return {
-                accessToken: newAccessToken,
-                refreshToken: refreshToken
-            };
-        } else {
-            localStorage.clear();
-            return null;
+    try {
+        const accessToken = localStorage.getItem("accessToken");
+        const refreshToken = localStorage.getItem("refreshToken");
+        if (isTokenExpire(accessToken, REFRESH_THRESHOLD)) {
+            if (isTokenExpire(refreshToken, 0)) {
+                const newAccessToken = await refresh(refreshToken);
+                localStorage.setItem("accessToken", newAccessToken);
+                return {
+                    accessToken: newAccessToken,
+                    refreshToken: refreshToken
+                };
+            } else {
+                localStorage.clear();
+                return null;
+            }
         }
-    }
 
-    return {
-        accessToken: accessToken,
-        refreshToken: refreshToken
-    };
+        return {
+            accessToken: accessToken,
+            refreshToken: refreshToken
+        };
+    } catch (e: any) {
+        console.log(e);
+    }
 }
 
 export function clear() {

@@ -89,8 +89,40 @@ export async function getUserInfo(accessToken: string): Promise<{ points: number
     };
 }
 
+export async function getLastChargingInfo(accessToken: string): Promise<{ time: Date }> {
+    const response = await axios.get(
+        XSPACE_URL.LIST_ACTION,
+        {
+            params: {
+                page: 0,
+                size: 10,
+                actionID: 2
+            },
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${accessToken}`
+            }
+        }
+    );
+
+    if (response.status !== 200) {
+        throw new Error(`API request failed with status ${response.status}: ${response.data}`);
+    }
+    console.log(response.data);
+    console.log(response.data.History.length);
+
+    if (response.data.History.length == 0) {
+        return {
+            time: new Date(0),
+        };
+    }
+
+    return {
+        time: new Date(response.data.History[0].Time),
+    };
+}
+
 export async function getDIDInfo(address: string): Promise<{ did: string, number: string }> {
-    console.log(address);
     const response = await axios.get(
         DID_URL.DID_INFO,
         {

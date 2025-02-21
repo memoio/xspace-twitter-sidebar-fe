@@ -38,6 +38,7 @@ export const XSPACE_URL = {
     "REFRESH": XSPACE_SERVER_URL + "/v1/refresh",
 
     "GET_USER_INFO": XSPACE_SERVER_URL + "/v1/user/info",
+    "LIST_ACTION": XSPACE_SERVER_URL + "/v1/point/history",
 
     "MINT_TWEET_NFT": XSPACE_SERVER_URL + "/v1/nft/tweet/mint",
     "MINT_DATA_NFT": XSPACE_SERVER_URL + "/v1/nft/data/mint"

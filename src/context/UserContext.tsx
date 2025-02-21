@@ -1,4 +1,4 @@
-import { getUserInfo } from "@/api/api";
+import { getUserInfo, getLastChargingInfo } from "@/api/api";
 import { checkExpire, getToken } from "@/storage/token";
 import React, { createContext, ReactNode, useContext, useEffect, useState } from "react";
 
@@ -19,7 +19,11 @@ interface UserContextType {
         space: number,
     }) => void,
 
-    update: () => Promise<void>,
+    chargingInfo: {
+        charging: boolean,
+        countdown: number,
+    }
+    update: () => Promise<boolean>,
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -36,16 +40,39 @@ export const UserContextProvider = ({ children }: UserContextProviderProps) => {
         space: 0,
     });
 
-    const update = async () => {
+    const [chargingInfo, setChargingInfo] = useState({
+        charging: false,
+        countdown: 0,
+    })
+
+    const update = async (): Promise<boolean> => {
         try {
             if (checkExpire()) {
-                throw new Error(`Login status has expired`);
+                return false;
             }
             const { accessToken } = await getToken();
             const user = await getUserInfo(accessToken);
             setUserInfo(user);
+
+            const { time: lastTime } = await getLastChargingInfo(accessToken);
+            const count = new Date().getTime() - lastTime.getTime();
+            // 将时间差转换为小时（1小时 = 3600000毫秒）
+            if (count >= 3600000 * 5) {
+                setChargingInfo({
+                    charging: false,
+                    countdown: 0,
+                })
+            } else {
+                setChargingInfo({
+                    charging: true,
+                    countdown: 3600000 * 5 - count,
+                })
+            }
+
+            return true;
         } catch (error) {
             console.error("Failed to update user info:", error);
+            return false;
         }
     }
 
@@ -94,7 +121,7 @@ export const UserContextProvider = ({ children }: UserContextProviderProps) => {
 
 
     return (
-        <UserContext.Provider value={{ userInfo, setPoints, setReferrals, setSpace, setUser, update }}>
+        <UserContext.Provider value={{ userInfo, chargingInfo, setPoints, setReferrals, setSpace, setUser, update }}>
             {children}
         </UserContext.Provider>
     );
